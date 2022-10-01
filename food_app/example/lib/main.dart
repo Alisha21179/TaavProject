@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      locale: const Locale('fa','IR'),
       theme: food_app.mainTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: food_app.FoodAppPageRoutes.splashPage,

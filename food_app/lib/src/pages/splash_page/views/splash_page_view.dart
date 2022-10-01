@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/background_stack.dart';
 import '../controllers/splash_page_controller.dart';
 
 class SplashPage extends GetView<SplashPageController> {
@@ -8,24 +9,22 @@ class SplashPage extends GetView<SplashPageController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          children: [
-            ...positionedList(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _welcomeText(),
-                _centerImage(),
-                const SizedBox(height: 70),
-                Obx(_makeAdminPart)
-              ],
-            ),
-          ],
-        ),
-      ),
+    return BackgroundStack(
+      widgetList: [
+        _mainBody(),
+      ],
+    );
+  }
+
+  Widget _mainBody() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _welcomeText(),
+        _centerImage(),
+        const SizedBox(height: 70),
+        Obx(_makeAdminPart)
+      ],
     );
   }
 
@@ -80,11 +79,18 @@ class SplashPage extends GetView<SplashPageController> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
           clipBehavior: Clip.hardEdge,
           decoration: const BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(0, 0),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                  color: Color.fromRGBO(148, 6, 6, 1.0)),
+            ],
             borderRadius: BorderRadius.all(
-              Radius.circular(100),
+              Radius.circular(10),
             ),
           ),
           width: double.infinity,
@@ -119,86 +125,5 @@ class SplashPage extends GetView<SplashPageController> {
         const Expanded(child: SizedBox()),
       ],
     );
-  }
-
-  List<Positioned> positionedList() {
-    return [
-      Positioned(
-        top: -500,
-        right: -300,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 500,
-              child: Expanded(
-                child: CircleAvatar(
-                  radius: 500,
-                  backgroundColor: Colors.red.withOpacity(0.9),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      Positioned(
-        top: 50,
-        right: 200,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              child: Expanded(
-                child: CircleAvatar(
-                  radius: 150,
-                  backgroundColor: Colors.red.withOpacity(0.9),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      Positioned(
-        top: 230,
-        right: 50,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 180,
-              child: Expanded(
-                child: CircleAvatar(
-                  radius: 200,
-                  backgroundColor: Colors.red.withOpacity(0.9),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      Positioned(
-        bottom: -200,
-        left: -40,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 300,
-              child: Expanded(
-                child: CircleAvatar(
-                  radius: 300,
-                  backgroundColor: Colors.red.withOpacity(0.9),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ];
   }
 }
