@@ -74,9 +74,14 @@ class SplashPage extends GetView<SplashPageController> {
   Widget _makeAdminButton() {
     return Column(
       children: [
-        const Text(
-          'مدیری وجود ندارد',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        Obx(
+          () => Text(
+            controller.statusOfAdmin(),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -84,10 +89,11 @@ class SplashPage extends GetView<SplashPageController> {
           decoration: const BoxDecoration(
             boxShadow: [
               BoxShadow(
-                  offset: Offset(0, 0),
-                  blurRadius: 5,
-                  spreadRadius: 1,
-                  color: Color.fromRGBO(148, 6, 6, 1.0)),
+                offset: Offset(0, 0),
+                blurRadius: 5,
+                spreadRadius: 1,
+                color: Color.fromRGBO(148, 6, 6, 1.0),
+              ),
             ],
             borderRadius: BorderRadius.all(
               Radius.circular(10),
