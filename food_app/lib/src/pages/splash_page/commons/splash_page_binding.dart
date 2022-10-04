@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 
 class SplashPageBinding extends Bindings{
   @override
-  void dependencies() {
+  void dependencies(){
     Get.lazyPut(SplashPageController.new);
   }
-
 }

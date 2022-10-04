@@ -1,17 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:food_app/src/infrastructure/commons/repositories/repository_commons.dart';
 import 'package:food_app/src/infrastructure/commons/url_commons.dart';
 import 'package:food_app/src/pages/splash_page/models/admin_availability_model.dart';
 import 'package:dartz/dartz.dart';
 
 class SplashPageRepository {
-  Dio dio = Dio(
-    BaseOptions(
-      baseUrl: UrlCommons.baseUrl,
-      connectTimeout: 2000,
-      sendTimeout: 2000,
-      receiveTimeout: 2000,
-    ),
-  );
+  Dio dio = RepositoryCommons.dio;
 
   Future<Either<String,bool>> getAdmin() async {
     try {
@@ -19,9 +13,7 @@ class SplashPageRepository {
         UrlCommons.userPath,
         queryParameters: AdminAvailabilityModel().toJson(),
       );
-      return Right(result.data!.isNotEmpty)/*result.data!.isNotEmpty*/;
-    } on FormatException catch(e){
-      return Left(e.message);
+      return Right(result.data!.isNotEmpty);
     } on Exception catch(e) {
       return Left(e.toString());
     }

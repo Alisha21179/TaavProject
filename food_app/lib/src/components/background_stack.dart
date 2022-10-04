@@ -84,8 +84,8 @@ class _BackgroundStackState extends State<BackgroundStack> {
         ),
       ),
       Positioned(
-        bottom: -200,
-        left: -40,
+        top: 350,
+        right: 180,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,

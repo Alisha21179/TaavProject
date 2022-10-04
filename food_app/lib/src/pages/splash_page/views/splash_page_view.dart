@@ -72,47 +72,47 @@ class SplashPage extends GetView<SplashPageController> {
   }
 
   Widget _makeAdminButton() {
-    return Column(
-      children: [
-        Obx(
-          () => Text(
-            controller.statusOfAdmin(),
+    return Obx(
+      () => Column(
+        children: [
+          Text(
+            controller.statusMessage.value,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 15,
             ),
           ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          clipBehavior: Clip.hardEdge,
-          decoration: const BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0, 0),
-                blurRadius: 5,
-                spreadRadius: 1,
-                color: Color.fromRGBO(148, 6, 6, 1.0),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            clipBehavior: Clip.hardEdge,
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0, 0),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                  color: Color.fromRGBO(148, 6, 6, 1.0),
+                ),
+              ],
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
               ),
-            ],
-            borderRadius: BorderRadius.all(
-              Radius.circular(10),
+            ),
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                await controller.makeAdminButton();
+              },
+              icon: const Icon(Icons.manage_accounts),
+              label: Text(
+                controller.buttonLabel.value,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
             ),
           ),
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton.icon(
-            onPressed: () async {
-              await controller.makeAdminButton();
-            },
-            icon: const Icon(Icons.manage_accounts),
-            label: const Text(
-              'ساختن مدیر',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

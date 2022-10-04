@@ -7,29 +7,15 @@ class SplashPageController extends GetxController {
   RxBool adminAvailable = false.obs;
   RxBool showIndicator = false.obs;
   RxString buttonMessage = 'مدیری وجود ندارد'.obs;
+  RxString statusMessage = ''.obs;
   SplashPageRepository repository = SplashPageRepository();
+  RxString buttonLabel = ''.obs;
 
   @override
   void onInit() async {
-    indicatorController(
+    await indicatorController(
       duringIndication: () async {
-        final Either<String, bool> result = await repository.getAdmin();
-        result.fold(
-          (l) async {
-            adminAvailable.value
-                ? await makeAdminButton()
-                : await indicatorController();
-            buttonMessage.value = l;
-            statusOfAdmin();
-          },
-          (r) async {
-            adminAvailable.value
-                ? await makeAdminButton()
-                : await indicatorController();
-            adminAvailable.value = r;
-            statusOfAdmin();
-          },
-        );
+        await checkAdminStatusFromRepository();
       },
     );
     super.onInit();
@@ -37,8 +23,17 @@ class SplashPageController extends GetxController {
 
   Future<void> makeAdminButton() async {
     adminAvailable.value = false;
+    _statusOfAdmin();
     await indicatorController();
-    Get.offAndToNamed(FoodAppPageRoutes.adminSignupPage);
+    if (statusMessage.value == 'مدیری وجود ندارد') {
+      Get.offAndToNamed(FoodAppPageRoutes.adminSignupPage);
+    } else if (statusMessage.value == 'مشکل در ارتباط با سرور') {
+      await indicatorController(
+        duringIndication: () async {
+          await checkAdminStatusFromRepository();
+        },
+      );
+    }
   }
 
   Future<void> indicatorController(
@@ -46,15 +41,37 @@ class SplashPageController extends GetxController {
     showIndicator.value = true;
     duringIndication != null ? await duringIndication() : null;
     await Future.delayed(
-      const Duration(seconds: 2),
+      const Duration(seconds: 1),
     ).then((value) => showIndicator.value = false);
   }
 
-  String statusOfAdmin() {
-    String statusMessage;
+  void _statusOfAdmin() {
+    // String statusMessage;
     buttonMessage.value != 'مدیری وجود ندارد'
-        ? statusMessage = 'مشکل در ارتباط با سرور'
-        : statusMessage = 'مدیری وجود ندارد';
-    return statusMessage;
+        ? statusMessage.value = 'مشکل در ارتباط با سرور'
+        : statusMessage.value = 'مدیری وجود ندارد';
+    statusMessage.value == 'مشکل در ارتباط با سرور'
+        ? buttonLabel.value = 'تلاش مجدد'
+        : buttonLabel.value = 'ساختن مدیر';
+  }
+
+  Future<void> checkAdminStatusFromRepository() async {
+    final Either<String, bool> result = await repository.getAdmin();
+    result.fold(
+      (l) async {
+        buttonMessage.value = l;
+        _statusOfAdmin();
+        adminAvailable.value
+            ? await makeAdminButton()
+            : await indicatorController();
+      },
+      (r) async {
+        adminAvailable.value = r;
+        _statusOfAdmin();
+        adminAvailable.value
+            ? await makeAdminButton()
+            : await indicatorController();
+      },
+    );
   }
 }
