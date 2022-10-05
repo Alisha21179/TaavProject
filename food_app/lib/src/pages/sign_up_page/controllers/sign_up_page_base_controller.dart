@@ -1,5 +1,9 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../infrastructure/commons/models/user_view_model.dart';
+import '../repositories/sign_up_page_repository.dart';
 
 abstract class SignUpPageBaseController extends GetxController {
   final Rx<GlobalKey<FormState>> mainFormKey = Rx(GlobalKey<FormState>());
@@ -15,10 +19,41 @@ abstract class SignUpPageBaseController extends GetxController {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+  SignUpPageRepository repository = SignUpPageRepository();
   abstract String pageTitle;
+  String? getUserEitherError;
+  List<UserViewModel> userList = [];
+
+  @override
+  void onInit() async {
+    Either<String, List<UserViewModel>> getUserListEither =
+        await repository.getUser();
+    getUserListEither.fold(
+      (l) => getUserEitherError = l,
+      (r) => userList.addAllIf(r.isNotEmpty, r),
+    );
+    super.onInit();
+  }
+
   Future<void> submitButton();
 
-  String? nameValidator(String? value,{required String message}) {
+  String? usernameValidator(String? value) {
+    String? usernameValidatorMessage;
+    if(getUserEitherError!=null){
+      usernameValidatorMessage ='مشکل در ارتباط با سرور، دوباره امتحان کنید';
+    }
+    if (userList.isNotEmpty) {
+      for (UserViewModel element in userList) {
+          if(element.username ==value){
+            usernameValidatorMessage= 'نام کابری قبلا انتخاب شده است';
+          }
+        }
+    }
+
+    return usernameValidatorMessage;
+  }
+
+  String? nameValidator(String? value, {required String message}) {
     if (value != null && value.isNotEmpty) {
       return null;
     }
@@ -59,6 +94,9 @@ abstract class SignUpPageBaseController extends GetxController {
       if (value.length < 8) {
         return 'رمز عبور باید حداقل 8 رقم باشد';
       }
+      if(confirmPasswordController.text.trim().isEmpty){
+        return 'لطفا فیلد تایید رمز را پر کنید';
+      }
       if (value.contains(
             RegExp(r'[A-Za-z]'),
           ) &&
@@ -72,5 +110,4 @@ abstract class SignUpPageBaseController extends GetxController {
     }
     return null;
   }
-
 }
