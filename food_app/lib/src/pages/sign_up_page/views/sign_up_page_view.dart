@@ -26,6 +26,7 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
               ),
               children: [
                 Form(
+                  key: controller.mainFormKey,
                   child: Column(
                     children: [
                       _titleText(context),
@@ -46,7 +47,7 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
                       Utils.largeVerticalSpace,
                       _confirmPasswordTextField(),
                       Utils.largeVerticalSpace,
-                      _confirmButton(),
+                      _submitButton(),
                     ],
                   ),
                 )
@@ -58,114 +59,7 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
     );
   }
 
-  Widget _confirmPasswordTextField() {
-    return _textFormField(
-                      labelText: 'تایید رمزعبور',
-                      textInputAction: TextInputAction.done,
-                      controller: controller.confirmPasswordController,
-                      validator: (value) {
-                        return controller.confirmPasswordValidator(value);
-                      },
-                      autoValidateMode: AutovalidateMode.onUserInteraction,
-                    );
-  }
-
-  Widget _passwordTextField() {
-    return _textFormField(
-                      labelText: 'رمزعبور',
-                      textInputAction: TextInputAction.next,
-                      controller: controller.passwordController,
-                      validator: (value) {
-                        return controller.passwordValidator(value);
-                      },
-                      autoValidateMode: AutovalidateMode.onUserInteraction,
-                    );
-  }
-
-  Widget _userNameTextField() {
-    return _textFormField(
-                      labelText: 'نام کاربری',
-                      textInputAction: TextInputAction.next,
-                      controller: controller.usernameController,
-                      validator: (value) {
-                        return controller.usernameValidator(value);
-                      },
-                    );
-  }
-
-  Widget _phoneNumberTextField() {
-    return _textFormField(
-                      hintText: '*********09',
-                      labelText: 'شماره موبایل',
-                      maxLength: 11,
-                      textInputAction: TextInputAction.next,
-                      controller: controller.phoneNumberController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[0-9]'),
-                        ),
-                      ],
-                      validator: (value) {
-                        return controller.phoneNumberValidator(value);
-                      },
-                      autoValidateMode: AutovalidateMode.onUserInteraction,
-                    );
-  }
-
-  Widget _addressTextField() {
-    return _textFormField(
-                      labelText: 'آدرس',
-                      textInputAction: TextInputAction.next,
-                      controller: controller.addressController,
-                      keyboardType: TextInputType.streetAddress,
-                      validator: (value) {
-                        return controller.nameValidator(
-                          value,
-                          message: 'آدرس الزامیست',
-                        );
-                      },
-                    );
-  }
-
-  Widget _familyTextField() {
-    return _textFormField(
-                      labelText: 'نام خانوادگی',
-                      textInputAction: TextInputAction.next,
-                      controller: controller.familyController,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter(RegExp(r"[ا-یA-Za-z]"),
-                            allow: true)
-                      ],
-                      validator: (value) {
-                        return controller.nameValidator(
-                          value,
-                          message: 'نام خانوادگی الزامیست',
-                        );
-                      },
-                    );
-  }
-
-  Widget _nameTextField() {
-    return _textFormField(
-                      labelText: 'نام',
-                      textInputAction: TextInputAction.next,
-                      controller: controller.nameController,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter(RegExp(r"[ا-یA-Za-z]"),
-                            allow: true)
-                      ],
-                      validator: (value) {
-                        return controller.nameValidator(
-                          value,
-                          message: 'نام الزامی است',
-                        );
-                      },
-                    );
-  }
-
-  Widget _confirmButton() {
+  Widget _submitButton() {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
@@ -183,16 +77,171 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
       ),
       width: double.infinity,
       height: 50,
-      child: ElevatedButton(
-        onPressed: () {},
-        child: const Text(
-          'ثبت',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
+      child: Obx(
+        () => ElevatedButton(
+          onPressed: () async {
+            await controller.submitButtonValidate();
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'ثبت',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              Utils.smallHorizontalSpace,
+              controller.showIndicator.value
+                  ? _circularIndicator()
+                  : Utils.mereSizedBox,
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _circularIndicator() {
+    return const SizedBox(
+      height: 40,
+      // width: 40,
+      child: CircularProgressIndicator(
+        color: Colors.white,
+        backgroundColor: Colors.transparent,
+        strokeWidth: 5,
+      ),
+    );
+  }
+
+  Widget _confirmPasswordTextField() {
+    return Obx(
+      () => _textFormField(
+        labelText: 'تایید رمزعبور',
+        textInputAction: TextInputAction.done,
+        controller: controller.confirmPasswordController,
+        validator: (value) {
+          return controller.confirmPasswordValidator(value);
+        },
+        autoValidateMode: AutovalidateMode.onUserInteraction,
+        isObSecure: controller.confirmPasswordIsObSecure.value,
+        suffixIcon: _isObSecureSuffixIcon(
+            isObSecure: controller.confirmPasswordIsObSecure),
+      ),
+    );
+  }
+
+  Widget _isObSecureSuffixIcon({required RxBool isObSecure}) {
+    return GestureDetector(
+      child: isObSecure.value
+          ? const Icon(Icons.visibility)
+          : const Icon(Icons.visibility_off),
+      onTap: () {
+        isObSecure.value = !isObSecure.value;
+      },
+    );
+  }
+
+  Widget _passwordTextField() {
+    return Obx(
+      () => _textFormField(
+        labelText: 'رمزعبور',
+        textInputAction: TextInputAction.next,
+        controller: controller.passwordController,
+        validator: (value) {
+          return controller.passwordValidator(value);
+        },
+        autoValidateMode: AutovalidateMode.onUserInteraction,
+        isObSecure: controller.passwordIsObSecure.value,
+        suffixIcon:
+            _isObSecureSuffixIcon(isObSecure: controller.passwordIsObSecure),
+      ),
+    );
+  }
+
+  Widget _userNameTextField() {
+    return _textFormField(
+      labelText: 'نام کاربری',
+      textInputAction: TextInputAction.next,
+      controller: controller.usernameController,
+      validator: (value) {
+        return controller.usernameValidator(value);
+      },
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget _phoneNumberTextField() {
+    return _textFormField(
+      hintText: '*********09',
+      labelText: 'شماره موبایل',
+      maxLength: 11,
+      textInputAction: TextInputAction.next,
+      controller: controller.phoneNumberController,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        FilteringTextInputFormatter.allow(
+          RegExp(r'[0-9]'),
+        ),
+      ],
+      validator: (value) {
+        return controller.phoneNumberValidator(value);
+      },
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget _addressTextField() {
+    return _textFormField(
+      labelText: 'آدرس',
+      textInputAction: TextInputAction.next,
+      controller: controller.addressController,
+      keyboardType: TextInputType.streetAddress,
+      validator: (value) {
+        return controller.nameValidator(
+          value,
+          message: 'آدرس الزامیست',
+        );
+      },
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget _familyTextField() {
+    return _textFormField(
+      labelText: 'نام خانوادگی',
+      textInputAction: TextInputAction.next,
+      controller: controller.familyController,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter(RegExp(r"[ا-یA-Za-z]"), allow: true)
+      ],
+      validator: (value) {
+        return controller.nameValidator(
+          value,
+          message: 'نام خانوادگی الزامیست',
+        );
+      },
+      autoValidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget _nameTextField() {
+    return _textFormField(
+      labelText: 'نام',
+      textInputAction: TextInputAction.next,
+      controller: controller.nameController,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter(RegExp(r"[ا-یA-Za-z]"), allow: true)
+      ],
+      validator: (value) {
+        return controller.nameValidator(
+          value,
+          message: 'نام الزامی است',
+        );
+      },
+      autoValidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 
@@ -254,8 +303,9 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
     );
   }
 
-  Widget _formDropdownButton({required List<String> itemBuildList,
-    required TextEditingController controller}) {
+  Widget _formDropdownButton(
+      {required List<String> itemBuildList,
+      required TextEditingController controller}) {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(
         isDense: true,
@@ -269,12 +319,11 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
       ),
       items: itemBuildList
           .map(
-            (e) =>
-            DropdownMenuItem(
+            (e) => DropdownMenuItem(
               value: e,
               child: Text(e),
             ),
-      )
+          )
           .toList(),
       onChanged: (value) {
         controller.text = value!;
@@ -305,6 +354,8 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
     AutovalidateMode? autoValidateMode,
     int? maxLength,
     String? hintText,
+    bool isObSecure = false,
+    Widget? suffixIcon,
   }) {
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -314,10 +365,12 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
         color: Colors.white.withOpacity(0.5),
       ),
       child: TextFormField(
+        obscureText: isObSecure,
         maxLength: maxLength,
         textInputAction: textInputAction,
         controller: controller,
         decoration: InputDecoration(
+          suffixIcon: suffixIcon,
           hintText: hintText,
           counterText: '',
           isDense: true,
@@ -329,9 +382,9 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
           ),
           label: labelText != null
               ? Text(
-            labelText,
-            style: TextFormFieldUtils.textStyleSize20,
-          )
+                  labelText,
+                  style: TextFormFieldUtils.textStyleSize20,
+                )
               : null,
         ),
         inputFormatters: inputFormatters,
@@ -345,10 +398,7 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
   Widget _titleText(BuildContext context) {
     return Text(
       controller.pageTitle,
-      style: Theme
-          .of(context)
-          .textTheme
-          .titleMedium,
+      style: Theme.of(context).textTheme.titleMedium,
     );
   }
 }

@@ -52,9 +52,10 @@ class SplashPage extends GetView<SplashPageController> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          controller.showIndicator.value
-              ? _circularIndicator()
-              : _makeAdminButton()
+          if (controller.showIndicator.value)
+            _circularIndicator()
+          else if (controller.showButton.value)
+            _makeAdminButton()
         ],
       ),
     );
@@ -102,12 +103,13 @@ class SplashPage extends GetView<SplashPageController> {
             height: 50,
             child: ElevatedButton.icon(
               onPressed: () async {
-                await controller.makeAdminButton();
+                await controller.makeAdminButtonOnTap();
               },
               icon: const Icon(Icons.manage_accounts),
               label: Text(
                 controller.buttonLabel.value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
             ),
           ),

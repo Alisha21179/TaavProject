@@ -6,13 +6,15 @@ import 'package:get/get.dart';
 class SplashPageController extends GetxController {
   RxBool adminAvailable = false.obs;
   RxBool showIndicator = false.obs;
+  RxBool showButton = false.obs;
   RxString buttonMessage = 'مدیری وجود ندارد'.obs;
   RxString statusMessage = ''.obs;
-  SplashPageRepository repository = SplashPageRepository();
   RxString buttonLabel = ''.obs;
+  SplashPageRepository repository = SplashPageRepository();
 
   @override
   void onInit() async {
+    await Future.delayed(const Duration(seconds: 2));
     await indicatorController(
       duringIndication: () async {
         await checkAdminStatusFromRepository();
@@ -21,11 +23,12 @@ class SplashPageController extends GetxController {
     super.onInit();
   }
 
-  Future<void> makeAdminButton() async {
-    adminAvailable.value = false;
-    _statusOfAdmin();
+  Future<void> makeAdminButtonOnTap() async {
+    _setStatusOfAdmin();
     await indicatorController();
-    if (statusMessage.value == 'مدیری وجود ندارد') {
+    if (adminAvailable.value) {
+      Get.offAndToNamed(FoodAppPageRoutes.loginPage);
+    } else if (statusMessage.value == 'مدیری وجود ندارد') {
       Get.offAndToNamed(FoodAppPageRoutes.adminSignupPage);
     } else if (statusMessage.value == 'مشکل در ارتباط با سرور') {
       await indicatorController(
@@ -45,7 +48,7 @@ class SplashPageController extends GetxController {
     ).then((value) => showIndicator.value = false);
   }
 
-  void _statusOfAdmin() {
+  void _setStatusOfAdmin() {
     // String statusMessage;
     buttonMessage.value != 'مدیری وجود ندارد'
         ? statusMessage.value = 'مشکل در ارتباط با سرور'
@@ -58,19 +61,19 @@ class SplashPageController extends GetxController {
   Future<void> checkAdminStatusFromRepository() async {
     final Either<String, bool> result = await repository.getAdmin();
     result.fold(
-      (l) async {
+          (l) async {
         buttonMessage.value = l;
-        _statusOfAdmin();
+        _setStatusOfAdmin();
         adminAvailable.value
-            ? await makeAdminButton()
-            : await indicatorController();
+            ? await makeAdminButtonOnTap()
+            : showButton.value=true;
       },
-      (r) async {
+          (r) async {
         adminAvailable.value = r;
-        _statusOfAdmin();
+        _setStatusOfAdmin();
         adminAvailable.value
-            ? await makeAdminButton()
-            : await indicatorController();
+            ? await makeAdminButtonOnTap()
+            : showButton.value=true;
       },
     );
   }

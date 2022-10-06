@@ -5,8 +5,5 @@ class UserSignUpPageController extends SignUpPageBaseController {
   String pageTitle = 'ثبت نام کاربر';
 
   @override
-  Future<void> submitButton() {
-    // TODO: implement submitButton
-    throw UnimplementedError();
-  }
+  bool thisControllerIsForAdmin = false;
 }

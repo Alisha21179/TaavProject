@@ -1,12 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
+import 'package:food_app/food_app.dart';
 import 'package:get/get.dart';
 
 import '../../../infrastructure/commons/models/user_view_model.dart';
 import '../repositories/sign_up_page_repository.dart';
 
 abstract class SignUpPageBaseController extends GetxController {
-  final Rx<GlobalKey<FormState>> mainFormKey = Rx(GlobalKey<FormState>());
+  final GlobalKey<FormState> mainFormKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController familyController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -19,35 +20,80 @@ abstract class SignUpPageBaseController extends GetxController {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-  SignUpPageRepository repository = SignUpPageRepository();
+  final SignUpPageRepository _repository = SignUpPageRepository();
   abstract String pageTitle;
+  abstract bool thisControllerIsForAdmin;
   String? getUserEitherError;
-  List<UserViewModel> userList = [];
+  final List<UserViewModel> userList = [];
+  RxBool showIndicator = false.obs;
+  RxBool passwordIsObSecure = true.obs;
+  RxBool confirmPasswordIsObSecure = true.obs;
 
-  @override
-  void onInit() async {
+  Future<void> getUserList() async {
     Either<String, List<UserViewModel>> getUserListEither =
-        await repository.getUser();
+        await _repository.getUser();
     getUserListEither.fold(
       (l) => getUserEitherError = l,
-      (r) => userList.addAllIf(r.isNotEmpty, r),
+      (r) {
+        getUserEitherError = null;
+        userList.addAllIf(r.isNotEmpty, r);
+      },
     );
-    super.onInit();
   }
 
-  Future<void> submitButton();
+  Future<void> submitButtonValidate() async {
+    showIndicator.value = true;
+    await _indicatorController(
+      duringIndication: () async {
+        await getUserList();
+        await Future.delayed(
+          const Duration(seconds: 1),
+          () async {
+            if (mainFormKey.currentState!.validate()) {
+              UserViewModel adminViewModel = UserViewModel(
+                isAdmin: thisControllerIsForAdmin,
+                name: nameController.text,
+                family: familyController.text,
+                address: addressController.text,
+                birthday:
+                    '${birthYearController.text}/${birthMonthController.text}/${birthdayController.text}',
+                phoneNumber: phoneNumberController.text,
+                username: usernameController.text,
+                password: passwordController.text,
+              );
+              await _repository.signItUpToServer(adminViewModel);
+              Get.offAndToNamed(FoodAppPageRoutes.loginPage);
+            }
+          },
+        );
+      },
+    );
+    showIndicator.value = false;
+  }
+
+  Future<void> _indicatorController(
+      {Future<void>? Function()? duringIndication}) async {
+    showIndicator.value = true;
+    duringIndication != null ? await duringIndication() : null;
+    await Future.delayed(
+      const Duration(seconds: 1),
+    ).then((value) => showIndicator.value = false);
+  }
 
   String? usernameValidator(String? value) {
     String? usernameValidatorMessage;
-    if(getUserEitherError!=null){
-      usernameValidatorMessage ='مشکل در ارتباط با سرور، دوباره امتحان کنید';
+    if (getUserEitherError != null) {
+      usernameValidatorMessage = 'مشکل در ارتباط با سرور، دوباره امتحان کنید';
     }
     if (userList.isNotEmpty) {
       for (UserViewModel element in userList) {
-          if(element.username ==value){
-            usernameValidatorMessage= 'نام کابری قبلا انتخاب شده است';
-          }
+        if (element.username == value) {
+          usernameValidatorMessage = 'نام کابری قبلا انتخاب شده است';
         }
+      }
+    }
+    if (value == null || value.trim().isEmpty) {
+      usernameValidatorMessage = 'الزامی';
     }
 
     return usernameValidatorMessage;
@@ -85,6 +131,8 @@ abstract class SignUpPageBaseController extends GetxController {
       } else {
         return null;
       }
+    } else if (value == null || value.trim().isEmpty) {
+      return 'الزامی';
     }
     return null;
   }
@@ -94,7 +142,7 @@ abstract class SignUpPageBaseController extends GetxController {
       if (value.length < 8) {
         return 'رمز عبور باید حداقل 8 رقم باشد';
       }
-      if(confirmPasswordController.text.trim().isEmpty){
+      if (confirmPasswordController.text.trim().isEmpty) {
         return 'لطفا فیلد تایید رمز را پر کنید';
       }
       if (value.contains(
@@ -107,6 +155,8 @@ abstract class SignUpPageBaseController extends GetxController {
       } else {
         return 'رمزعبور باید ترکیب عدد و حروف انگلیسی باشد';
       }
+    } else if (value == null || value.trim().isEmpty) {
+      return 'الزامی';
     }
     return null;
   }

@@ -35,16 +35,16 @@ class UserViewModel {
     );
   }
 
-  static Map<String, dynamic> toJson(UserViewModel model) {
+  Map<String, dynamic> toJson() {
     return {
-      UserViewModel.isAdminKey: model.isAdmin,
-      UserViewModel.nameKey: model.name,
-      UserViewModel.familyKey: model.family,
-      UserViewModel.addressKey: model.address,
-      UserViewModel.birthdayKey: model.birthday,
-      UserViewModel.phoneNumberKey: model.phoneNumber,
-      UserViewModel.usernameKey: model.username,
-      UserViewModel.passwordKey: model.password,
+      UserViewModel.isAdminKey: isAdmin,
+      UserViewModel.nameKey: name,
+      UserViewModel.familyKey: family,
+      UserViewModel.addressKey: address,
+      UserViewModel.birthdayKey: birthday,
+      UserViewModel.phoneNumberKey: phoneNumber,
+      UserViewModel.usernameKey: username,
+      UserViewModel.passwordKey: password,
     };
   }
 }
