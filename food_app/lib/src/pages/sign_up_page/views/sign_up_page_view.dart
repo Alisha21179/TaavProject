@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:food_app/src/components/custom_circular_indicator.dart';
 import 'package:get/get.dart';
 
 import '../../../components/background_stack.dart';
+import '../../../components/text_form_field.dart';
 import '../../../infrastructure/utils/utils.dart';
 import '../commons/birth_date_list.dart';
 import '../controllers/sign_up_page_base_controller.dart';
@@ -94,23 +96,11 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
               ),
               Utils.smallHorizontalSpace,
               controller.showIndicator.value
-                  ? _circularIndicator()
+                  ? customCircularIndicator()
                   : Utils.mereSizedBox,
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _circularIndicator() {
-    return const SizedBox(
-      height: 40,
-      // width: 40,
-      child: CircularProgressIndicator(
-        color: Colors.white,
-        backgroundColor: Colors.transparent,
-        strokeWidth: 5,
       ),
     );
   }
@@ -126,20 +116,9 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
         },
         autoValidateMode: AutovalidateMode.onUserInteraction,
         isObSecure: controller.confirmPasswordIsObSecure.value,
-        suffixIcon: _isObSecureSuffixIcon(
+        suffixIcon: obSecureSuffixIcon(
             isObSecure: controller.confirmPasswordIsObSecure),
       ),
-    );
-  }
-
-  Widget _isObSecureSuffixIcon({required RxBool isObSecure}) {
-    return GestureDetector(
-      child: isObSecure.value
-          ? const Icon(Icons.visibility)
-          : const Icon(Icons.visibility_off),
-      onTap: () {
-        isObSecure.value = !isObSecure.value;
-      },
     );
   }
 
@@ -155,7 +134,7 @@ class SignUpPage<T extends SignUpPageBaseController> extends GetView<T> {
         autoValidateMode: AutovalidateMode.onUserInteraction,
         isObSecure: controller.passwordIsObSecure.value,
         suffixIcon:
-            _isObSecureSuffixIcon(isObSecure: controller.passwordIsObSecure),
+            obSecureSuffixIcon(isObSecure: controller.passwordIsObSecure),
       ),
     );
   }

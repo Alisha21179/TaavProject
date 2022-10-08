@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 
 class BackgroundStack extends StatefulWidget {
   final List<Widget> widgetList;
-  const BackgroundStack({Key? key,required this.widgetList}) : super(key: key);
+  final PreferredSizeWidget? appbar;
+  final BottomNavigationBar? bottomNavigationBar;
+  const BackgroundStack({
+    Key? key,
+    required this.widgetList,
+    this.appbar,
+    this.bottomNavigationBar,
+  }) : super(key: key);
 
   @override
   State<BackgroundStack> createState() => _BackgroundStackState();
@@ -12,6 +19,8 @@ class _BackgroundStackState extends State<BackgroundStack> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: widget.appbar,
+      bottomNavigationBar: widget.bottomNavigationBar,
       body: SafeArea(
         child: Stack(
           clipBehavior: Clip.antiAliasWithSaveLayer,
