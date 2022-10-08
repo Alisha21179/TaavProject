@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: food_app.mainTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: food_app.FoodAppPageRoutes.splashPage,
-      getPages: food_app.pages,
+      getPages: food_app.foodAppPages,
     );
   }
 }

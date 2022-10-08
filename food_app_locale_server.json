@@ -1,0 +1,29 @@
+{
+  "users": [
+    {
+      "isAdmin": true,
+      "name": "Ali",
+      "family": "Shahidzade",
+      "address": "Shiraz/kolbe",
+      "birthday": "1379/11/2",
+      "phoneNumber": "09371227727",
+      "username": "Alisha",
+      "password": "1a2l11i79",
+      "id": 1
+    },
+    {
+      "isAdmin": false,
+      "name": "userAli",
+      "family": "Shahidzade",
+      "address": "Shiraz/Kolbe",
+      "birthday": "1379/11/2",
+      "phoneNumber": "09371227727",
+      "username": "Alishauser",
+      "password": "1a2l11i79",
+      "id": 2
+    }
+  ],
+  "categories": [
+
+  ]
+}

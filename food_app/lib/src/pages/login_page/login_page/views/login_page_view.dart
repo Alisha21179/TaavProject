@@ -5,9 +5,9 @@ import 'package:get/get.dart';
 
 import '../../../../components/custom_circular_indicator.dart';
 import '../../../../infrastructure/utils/utils.dart';
-import '../controllers/login_page_controller.dart';
+import '../controllers/login_page_base_controller.dart';
 
-class LoginPageView extends GetView<LoginPageController> {
+class LoginPageView<T extends LoginPageBaseController> extends GetView<T> {
   const LoginPageView({Key? key}) : super(key: key);
 
   @override
@@ -37,13 +37,21 @@ class LoginPageView extends GetView<LoginPageController> {
                         Utils.giantVerticalSpace,
                         _usernameTextFormField(),
                         Utils.giantVerticalSpace,
-                        _passwordTextFormField(),
-                        Utils.giantVerticalSpace,
+                        _secondTextFormField(),
+                        Utils.smallVerticalSpace,
+                        controller.showRememberMeCheckBox
+                            ? _rememberMe(context)
+                            : Utils.mereSizedBox,
+                        Utils.smallVerticalSpace,
                         _submitButton(),
                         Utils.giantVerticalSpace,
-                        _forgotPassword(context),
+                        controller.showForgotPassword
+                            ? _forgotPassword(context)
+                            : Utils.mereSizedBox,
                         Utils.mediumVerticalSpace,
-                        _signUp(context),
+                        controller.showSignup
+                            ? _signUp(context)
+                            : Utils.mereSizedBox,
                       ],
                     ),
                   ),
@@ -53,6 +61,27 @@ class LoginPageView extends GetView<LoginPageController> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _rememberMe(BuildContext context) {
+    return Obx(
+      () => Row(
+        children: [
+          Checkbox(
+            value: controller.rememberMeCheckBoxValue.value,
+            onChanged: controller.checkBoxOnTap,
+          ),
+          Text(
+            'مرا به خاطر بسپار',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -93,14 +122,16 @@ class LoginPageView extends GetView<LoginPageController> {
   Widget _submitButton() {
     return Obx(
       () => _extractedSubmitButton(
-        label: 'ورود',
+        label: controller.submitButtonLabel,
         controller: controller,
       ),
     );
   }
 
-  Widget _extractedSubmitButton(
-      {required String label, required LoginPageController controller}) {
+  Widget _extractedSubmitButton({
+    required String label,
+    required LoginPageBaseController controller,
+  }) {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
@@ -120,7 +151,7 @@ class LoginPageView extends GetView<LoginPageController> {
       height: 50,
       child: ElevatedButton(
         onPressed: () async {
-          await controller.loginButtonOnPressed();
+          await controller.submitButtonOnPressed();
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -142,16 +173,17 @@ class LoginPageView extends GetView<LoginPageController> {
     );
   }
 
-  Widget _passwordTextFormField() {
+  Widget _secondTextFormField() {
     return Obx(
       () => customTextFormField(
         textInputAction: TextInputAction.done,
-        controller: controller.passwordController,
-        labelText: 'رمز عبور',
+        controller: controller.secondTextFieldController,
+        labelText: controller.secondTextFormFieldLabel,
         isObSecure: controller.passwordIsObSecure.value,
-        suffixIcon: obSecureSuffixIcon(
-          isObSecure: controller.passwordIsObSecure,
-        ),
+        suffixIcon: controller.secondTextFormFieldIsObSecure
+            ? obSecureSuffixIcon(isObSecure: controller.passwordIsObSecure)
+            : null,
+        validator: controller.passwordValidator,
       ),
     );
   }
@@ -161,12 +193,13 @@ class LoginPageView extends GetView<LoginPageController> {
       textInputAction: TextInputAction.next,
       controller: controller.usernameController,
       labelText: 'نام کاربری',
+      validator: controller.usernameValidator,
     );
   }
 
   Widget _titleText(BuildContext context) {
     return Text(
-      'صفحه ورود',
+      controller.titleText,
       style: Theme.of(context).textTheme.titleMedium,
     );
   }

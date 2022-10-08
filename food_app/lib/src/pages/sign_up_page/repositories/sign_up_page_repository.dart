@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:food_app/src/infrastructure/commons/models/user_view_model.dart';
-import 'package:food_app/src/infrastructure/commons/repositories/repository_commons.dart';
-import 'package:food_app/src/infrastructure/commons/url_commons.dart';
+
+import '../../../infrastructure/commons/models/user_view_model.dart';
+import '../../../infrastructure/commons/repositories/repository_commons.dart';
+import '../../../infrastructure/commons/url_commons.dart';
+import '../models/insert_user_dto.dart';
 
 class SignUpPageRepository {
   final Dio dio = RepositoryCommons.dio;
@@ -25,7 +27,7 @@ class SignUpPageRepository {
   }
 
   Future<Either<String, UserViewModel>> signItUpToServer(
-      UserViewModel user) async {
+      InsertUserDTO user) async {
     try {
       Response<Map<String, dynamic>> response =
           await dio.post(UrlCommons.userPath, data: user.toJson());

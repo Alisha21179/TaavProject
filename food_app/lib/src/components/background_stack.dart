@@ -4,6 +4,7 @@ class BackgroundStack extends StatefulWidget {
   final List<Widget> widgetList;
   final PreferredSizeWidget? appbar;
   final BottomNavigationBar? bottomNavigationBar;
+
   const BackgroundStack({
     Key? key,
     required this.widgetList,

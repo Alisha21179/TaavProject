@@ -8,6 +8,7 @@ ThemeData mainTheme = ThemeData(
   scaffoldBackgroundColor: Colors.grey.shade200,
   textTheme: _textTheme(),
   inputDecorationTheme: _inputDecorationTheme(),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: _primarySwatch(),),
 );
 
 InputDecorationTheme _inputDecorationTheme() {

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/login_page_controller.dart';
+import '../controllers/login_page_login_controller.dart';
 
 class LoginPageBinding extends Bindings {
   @override

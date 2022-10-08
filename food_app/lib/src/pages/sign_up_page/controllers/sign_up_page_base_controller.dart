@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:food_app/food_app.dart';
 import 'package:get/get.dart';
 
 import '../../../infrastructure/commons/models/user_view_model.dart';
+import '../../../infrastructure/routes/food_app_module_page_routes.dart';
+import '../models/insert_user_dto.dart';
 import '../repositories/sign_up_page_repository.dart';
 
 abstract class SignUpPageBaseController extends GetxController {
@@ -50,7 +51,7 @@ abstract class SignUpPageBaseController extends GetxController {
           const Duration(seconds: 1),
           () async {
             if (mainFormKey.currentState!.validate()) {
-              UserViewModel adminViewModel = UserViewModel(
+              InsertUserDTO adminViewModel = InsertUserDTO(
                 isAdmin: thisControllerIsForAdmin,
                 name: nameController.text,
                 family: familyController.text,
