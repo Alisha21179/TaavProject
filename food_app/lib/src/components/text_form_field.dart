@@ -16,6 +16,7 @@ Widget customTextFormField({
   String? hintText,
   bool isObSecure = false,
   Widget? suffixIcon,
+  Widget? prefixIcon,
 }) {
   return DecoratedBox(
     decoration: BoxDecoration(
@@ -31,6 +32,7 @@ Widget customTextFormField({
       controller: controller,
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
         hintText: hintText,
         counterText: '',
         isDense: true,
