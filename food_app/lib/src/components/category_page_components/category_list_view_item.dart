@@ -24,36 +24,37 @@ class _CategoryListItemState extends State<CategoryListItem> {
         left: Utils.smallSpace,
         right: Utils.smallSpace,
       ),
-      child: Expanded(
-        child: Row(
-          children: [
-            widget._viewModel.imageBase64String != null
-                ? Container(
-                    padding: const EdgeInsets.all(Utils.tinySpace),
-                    height: 100,
-                    width: 120,
-                    child: ImageUtils.base64StringToWidget(
-                      base64String: widget._viewModel.imageBase64String!,
-                      imageName: widget._viewModel.title,
-                      imageReturner: (imageBytes, imageFile) {
-                        return Image.memory(
-                          imageBytes,
-                          fit: BoxFit.fill,
-                        );
-                      },
-                    ),
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(Utils.tinySpace),
-                    child: const Icon(
-                      Icons.broken_image_outlined,
-                      size: 120,
-                    ),
+      child: Row(
+        children: [
+          widget._viewModel.imageBase64String != null
+              ? Container(
+                  padding: const EdgeInsets.all(Utils.tinySpace),
+                  height: 100,
+                  width: 120,
+                  child: ImageUtils.base64StringToWidget(
+                    base64String: widget._viewModel.imageBase64String!,
+                    imageName: widget._viewModel.title,
+                    imageReturner: (imageBytes) {
+                      return Image.memory(
+                        imageBytes,
+                        fit: BoxFit.fill,
+                      );
+                    },
                   ),
-            Utils.smallHorizontalSpace,
-            Text(widget._viewModel.title,style: Theme.of(context).textTheme.titleMedium,),
-          ],
-        ),
+                )
+              : Container(
+                  padding: const EdgeInsets.all(Utils.tinySpace),
+                  child: const Icon(
+                    Icons.broken_image_outlined,
+                    size: 120,
+                  ),
+                ),
+          Utils.smallHorizontalSpace,
+          Text(
+            widget._viewModel.title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ],
       ),
     );
   }

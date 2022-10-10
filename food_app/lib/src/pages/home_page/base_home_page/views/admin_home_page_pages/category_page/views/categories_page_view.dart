@@ -37,29 +37,31 @@ class CategoriesPageView extends StatelessWidget {
       onRefresh: () async {
         await _controller.getCategoryList();
       },
-      child: Column(
-        children: [
-          Utils.tinyVerticalSpace,
-          customSearchBox(
-            context,
-            advancedButtonOnTap: () {},
-            searchBoxValidator: (value) {},
-            searchBoxController: _controller.searchBoxController,
-          ),
-          Obx(() => Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(
-                    Utils.smallSpace,
-                  ),
-                  itemCount: _controller.categoryList.value.length,
-                  itemBuilder: (context, index) {
-                    return CategoryListItem(
-                      viewModel: _controller.categoryList.value[index],
-                    );
-                  },
+      child: Obx(
+        () => Column(
+          children: [
+            Utils.tinyVerticalSpace,
+            customSearchBox(
+              context,
+              advancedButtonOnTap: () {},
+              searchBoxValidator: (value) {},
+              searchBoxController: _controller.searchBoxController,
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(
+                  Utils.smallSpace,
                 ),
-              ))
-        ],
+                itemCount: _controller.categoryList.value.length,
+                itemBuilder: (context, index) {
+                  return CategoryListItem(
+                    viewModel: _controller.categoryList.value[index],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
