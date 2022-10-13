@@ -1,4 +1,4 @@
-import 'package:food_app/src/infrastructure/commons/models/category_view_model.dart';
+import 'package:food_app/src/infrastructure/commons/models/admin_pages_models/category_view_model.dart';
 
 class CategoryInsertDTO {
   final String title;

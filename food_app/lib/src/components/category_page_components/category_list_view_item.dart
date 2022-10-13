@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/src/infrastructure/commons/models/category_view_model.dart';
+import 'package:food_app/src/infrastructure/commons/models/admin_pages_models/category_view_model.dart';
 
 import '../../infrastructure/utils/image_utils.dart';
 import '../../infrastructure/utils/utils.dart';
 
 class CategoryListItem extends StatefulWidget {
   final CategoryViewModel _viewModel;
+  final Future<void> Function(int categoryId) _deleteButtonOnTap;
+  final Future<void> Function(int categoryId) _editButtonOnTap;
 
-  const CategoryListItem({Key? key, required CategoryViewModel viewModel})
-      : _viewModel = viewModel,
+  const CategoryListItem({
+    Key? key,
+    required CategoryViewModel viewModel,
+    required Future<void> Function(int categoryId) deleteButtonOnTap,
+    required Future<void> Function(int categoryId) editButtonOnTap,
+  })  : _viewModel = viewModel,
+        _deleteButtonOnTap = deleteButtonOnTap,
+        _editButtonOnTap = editButtonOnTap,
         super(key: key);
 
   @override
@@ -50,10 +58,30 @@ class _CategoryListItemState extends State<CategoryListItem> {
                   ),
                 ),
           Utils.smallHorizontalSpace,
-          Text(
-            widget._viewModel.title,
-            style: Theme.of(context).textTheme.titleMedium,
+          Expanded(
+            child: Text(
+              widget._viewModel.title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
+          Expanded(
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await widget._deleteButtonOnTap(widget._viewModel.id);
+                  },
+                  child: const Icon(Icons.delete_outline),
+                ),
+                ElevatedButton(
+                  onPressed: () async{
+                    await widget._editButtonOnTap(widget._viewModel.id);
+                  },
+                  child: const Icon(Icons.edit),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

@@ -1,4 +1,6 @@
-class CategoryViewModel {
+import 'admin_pages_view_models.dart';
+
+class CategoryViewModel extends AdminPagesItemViewModel {
   static const String idKey = 'id';
   static const String titleKey = 'title';
   static const String imageBase64StringKey = 'imageBase64String';
@@ -7,10 +9,11 @@ class CategoryViewModel {
   final int id;
   final String title;
   final String? imageBase64String;
+
   //Map<String, dynamic>
   final List<dynamic> foodList;
 
-  const CategoryViewModel({
+  CategoryViewModel({
     required this.foodList,
     required this.id,
     required this.title,

@@ -56,7 +56,8 @@ class LoginPageController extends LoginPageBaseController {
         );
         if (mainFormKey.currentState!.validate()) {
           if (rememberMeCheckBoxValue.value) {
-            await box.write('savedUser', foundUser);
+            await box.write('savedUser_username', foundUser?.username);
+            await box.write('savedUser_password', foundUser?.password);
           }
           if (foundUser!.isAdmin) {
             Get.offAndToNamed(
