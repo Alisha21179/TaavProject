@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../../../../components/category_page_components/category_list_view_item.dart';
+import '../../../../../../../components/admin_page_components/admin_page_list_view_item.dart';
 import '../../../../../../../components/search_box.dart';
 import '../../../../../../../infrastructure/utils/utils.dart';
 import '../controllers/admin_pages_base_controller.dart';
@@ -16,13 +16,6 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    // if (T is AdminCategoryPageController) {
-    //   _controller = Get.put(AdminCategoryPageController());
-    // } else if (T is AdminRestaurantPageController) {
-    //   _controller = Get.put(AdminRestaurantPageController());
-    // } else if (T is AdminFoodPageController) {
-    //   _controller = Get.put(AdminFoodPageController());
-    // }
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.4),
       floatingActionButton: FloatingActionButton(
@@ -56,14 +49,15 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
                 padding: const EdgeInsets.all(
                   Utils.smallSpace,
                 ),
-                itemCount: _controller.categoryList.value.length,
+                itemCount: _controller.itemList.value.length,
                 itemBuilder: (context, index) {
-                  return CategoryListItem(
-                    viewModel: _controller.categoryList.value[index],
-                    deleteButtonOnTap: (categoryId) async {
-                      await _controller.deleteButtonOnTap(categoryId);
+                  return AdminPageListItem(
+                    viewModel: _controller.itemList.value[index],
+                    deleteButtonOnTap: (viewModelId) async {
+                      await _controller.deleteButtonOnTap(viewModelId);
                     },
-                    editButtonOnTap: (int categoryId) async {},
+                    editButtonOnTap: (int viewModelId) async {},
+                    infoLines: _controller.infoLines,
                   );
                 },
               ),

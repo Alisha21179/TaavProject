@@ -17,6 +17,7 @@ Widget customTextFormField({
   bool isObSecure = false,
   Widget? suffixIcon,
   Widget? prefixIcon,
+  int? maxLines,
 }) {
   return DecoratedBox(
     decoration: BoxDecoration(
@@ -26,6 +27,7 @@ Widget customTextFormField({
       color: Colors.white.withOpacity(0.5),
     ),
     child: TextFormField(
+      maxLines: maxLines,
       obscureText: isObSecure,
       maxLength: maxLength,
       textInputAction: textInputAction,

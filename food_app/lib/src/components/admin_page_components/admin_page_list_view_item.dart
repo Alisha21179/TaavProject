@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/src/infrastructure/commons/models/admin_pages_models/category_view_model.dart';
 
+import '../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../infrastructure/utils/image_utils.dart';
 import '../../infrastructure/utils/utils.dart';
 
-class CategoryListItem extends StatefulWidget {
-  final CategoryViewModel _viewModel;
-  final Future<void> Function(int categoryId) _deleteButtonOnTap;
-  final Future<void> Function(int categoryId) _editButtonOnTap;
+class AdminPageListItem<T extends AdminPagesItemViewModel>
+    extends StatefulWidget {
+  final T _viewModel;
+  final Future<void> Function(int viewModelId) _deleteButtonOnTap;
+  final Future<void> Function(int viewModelId) _editButtonOnTap;
+  final List<Widget> Function(T viewModel) infoLines;
 
-  const CategoryListItem({
+  const AdminPageListItem({
     Key? key,
-    required CategoryViewModel viewModel,
-    required Future<void> Function(int categoryId) deleteButtonOnTap,
-    required Future<void> Function(int categoryId) editButtonOnTap,
+    required T viewModel,
+    required Future<void> Function(int viewModelId) deleteButtonOnTap,
+    required Future<void> Function(int viewModelId) editButtonOnTap,
+    required this.infoLines,
   })  : _viewModel = viewModel,
         _deleteButtonOnTap = deleteButtonOnTap,
         _editButtonOnTap = editButtonOnTap,
         super(key: key);
 
   @override
-  State<CategoryListItem> createState() => _CategoryListItemState();
+  State<AdminPageListItem> createState() => _AdminPageListItemState();
 }
 
-class _CategoryListItemState extends State<CategoryListItem> {
+class _AdminPageListItemState extends State<AdminPageListItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -59,9 +62,11 @@ class _CategoryListItemState extends State<CategoryListItem> {
                 ),
           Utils.smallHorizontalSpace,
           Expanded(
-            child: Text(
-              widget._viewModel.title,
-              style: Theme.of(context).textTheme.titleMedium,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: widget.infoLines(widget._viewModel),
+              ),
             ),
           ),
           Expanded(
@@ -74,7 +79,7 @@ class _CategoryListItemState extends State<CategoryListItem> {
                   child: const Icon(Icons.delete_outline),
                 ),
                 ElevatedButton(
-                  onPressed: () async{
+                  onPressed: () async {
                     await widget._editButtonOnTap(widget._viewModel.id);
                   },
                   child: const Icon(Icons.edit),

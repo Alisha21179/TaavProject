@@ -5,22 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../../../../components/text_form_field.dart';
-import '../../../../../../../infrastructure/commons/models/admin_pages_models/category_view_model.dart';
+import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/utils/image_utils.dart';
-import '../../../../../../../infrastructure/utils/utils.dart';
-import '../models/category_page_models/category_insert_dto.dart';
+import '../models/admin_page_base_insert_dto.dart';
 import '../repositories/admin_page_base_repository.dart';
 
 abstract class AdminPagesBaseController extends GetxController {
-  TextEditingController addCategoryDialogTitleTextField =
+  TextEditingController addItemDialogTitleTextFieldController =
       TextEditingController();
   abstract TextEditingController searchBoxController;
-  final AdminPagesBaseRepository repository = AdminPagesBaseRepository();
+  abstract final AdminPagesBaseRepository repository;
+  abstract final List<Widget> Function(
+    AdminPagesItemViewModel viewModel,
+  ) infoLines;
   final ImagePicker imagePicker = ImagePicker();
   String? itemListServerProblem;
   String? imageBase64String;
-  Rx<List<CategoryViewModel>> categoryList = Rx([]);
+  Rx<List<AdminPagesItemViewModel>> itemList = Rx([]);
 
   @override
   void onInit() {
@@ -29,24 +30,24 @@ abstract class AdminPagesBaseController extends GetxController {
   }
 
   Future<void> getPageItemList() async {
-    Either<String, List<CategoryViewModel>> result =
-        await repository.getCategoryList();
+    Either<String, List<AdminPagesItemViewModel>> result =
+        await repository.getItemList();
     result.fold(
       (l) {
         itemListServerProblem = 'مشکل در ارتباط با سرور';
       },
       (r) {
-        categoryList.value = r;
+        itemList.value = r;
         itemListServerProblem = null;
       },
     );
   }
 
-  Future<bool> addCategoryToServer(
-      {required CategoryInsertDTO insertDTO}) async {
+  Future<bool> addItemToServer<T extends AdminPageBaseInsertDTO>(
+      {required T insertDTO}) async {
     bool addedSuccessFully = false;
     Either<String, bool> result =
-        await repository.createNewCategory(insertDTO: insertDTO);
+        await repository.createNewItem(insertDTO: insertDTO);
     result.fold(
       (l) {
         Get.showSnackbar(
@@ -102,21 +103,7 @@ abstract class AdminPagesBaseController extends GetxController {
     }
   }
 
-  Future<void> dialogSubmitButton(BuildContext context) async {
-    bool addedSuccessFully = false;
-    if (addCategoryDialogTitleTextField.text.isNotEmpty) {
-      CategoryInsertDTO insertDTO = CategoryInsertDTO(
-        foodList: [],
-        title: addCategoryDialogTitleTextField.text,
-        imageBase64String: imageBase64String,
-      );
-      addedSuccessFully = await addCategoryToServer(insertDTO: insertDTO);
-      if (addedSuccessFully) {
-        getPageItemList();
-        Get.back();
-      }
-    }
-  }
+  Future<void> dialogSubmitButton(BuildContext context);
 
   Future<void> deleteButtonOnTap(int categoryId) async {
     Either<String, bool> result =
@@ -139,70 +126,7 @@ abstract class AdminPagesBaseController extends GetxController {
     );
   }
 
-  Future<void> fABOnTap(BuildContext context) async {
-    imageBase64String = null;
-
-    customShowDialog(
-      context,
-      beforeCallingDialog: () {
-        addCategoryDialogTitleTextField.text = '';
-      },
-      title: const Text('افزودن دسته‌بندی'),
-      children: [
-        customTextFormField(
-          textInputAction: TextInputAction.done,
-          controller: addCategoryDialogTitleTextField,
-          validator: dialogTitleFieldValidator,
-          autoValidateMode: AutovalidateMode.onUserInteraction,
-        ),
-        Utils.smallVerticalSpace,
-        InkWell(
-          splashColor: Theme.of(context).primaryColor,
-          onTap: () async {
-            await addImageInkwellOnTap(
-              imageBytesHandler: (imageBytes) {},
-            );
-          },
-          child: Row(
-            children: [
-              Icon(
-                Icons.image,
-                size: 40,
-                color: Theme.of(context).primaryColor,
-              ),
-              Utils.smallHorizontalSpace,
-              const Text(
-                'افزودن تصویر دسته‌بندی',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-            ],
-          ),
-        ),
-        Utils.mediumVerticalSpace,
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await dialogSubmitButton(context);
-                },
-                child: const Text('افزودن'),
-              ),
-            ),
-            Utils.mediumHorizontalSpace,
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('لغو'),
-              ),
-            )
-          ],
-        ),
-      ],
-    );
-  }
+  Future<void> fABOnTap(BuildContext context);
 
   String? dialogTitleFieldValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
