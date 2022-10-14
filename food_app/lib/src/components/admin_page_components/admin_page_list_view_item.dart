@@ -8,14 +8,14 @@ class AdminPageListItem<T extends AdminPagesItemViewModel>
     extends StatefulWidget {
   final T _viewModel;
   final Future<void> Function(int viewModelId) _deleteButtonOnTap;
-  final Future<void> Function(int viewModelId) _editButtonOnTap;
+  final Future<void> Function(AdminPagesItemViewModel viewModel) _editButtonOnTap;
   final List<Widget> Function(T viewModel) infoLines;
 
   const AdminPageListItem({
     Key? key,
     required T viewModel,
     required Future<void> Function(int viewModelId) deleteButtonOnTap,
-    required Future<void> Function(int viewModelId) editButtonOnTap,
+    required Future<void> Function(AdminPagesItemViewModel viewModel) editButtonOnTap,
     required this.infoLines,
   })  : _viewModel = viewModel,
         _deleteButtonOnTap = deleteButtonOnTap,
@@ -80,7 +80,8 @@ class _AdminPageListItemState extends State<AdminPageListItem> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await widget._editButtonOnTap(widget._viewModel.id);
+                    await widget._editButtonOnTap(widget._viewModel);
+                    print(widget._viewModel.title);
                   },
                   child: const Icon(Icons.edit),
                 ),

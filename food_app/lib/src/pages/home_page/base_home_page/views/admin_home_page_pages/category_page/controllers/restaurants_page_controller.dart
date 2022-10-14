@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/models/restaurant_page_models/restaurant_insert_dto.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/repositories/admin_page_base_repository.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/repositories/restaurant_page_repository.dart';
-import 'package:get/get.dart';
 
 import '../../../../../../../components/text_form_field.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/restaurant_view_model.dart';
 import '../../../../../../../infrastructure/utils/utils.dart';
+import '../models/restaurant_page_models/restaurant_insert_dto.dart';
+import '../repositories/admin_page_base_repository.dart';
+import '../repositories/restaurant_page_repository.dart';
 import 'admin_pages_base_controller.dart';
 
 class AdminRestaurantPageController extends AdminPagesBaseController {
@@ -114,9 +113,92 @@ class AdminRestaurantPageController extends AdminPagesBaseController {
         InkWell(
           splashColor: Theme.of(context).primaryColor,
           onTap: () async {
-            await addImageInkwellOnTap(
-              imageBytesHandler: (imageBytes) {},
-            );
+            imageBase64String=await addImageInkwellOnTap();
+          },
+          child: Row(
+            children: [
+              Icon(
+                Icons.image,
+                size: 40,
+                color: Theme.of(context).primaryColor,
+              ),
+              Utils.smallHorizontalSpace,
+              const Text(
+                'افزودن تصویر رستوران',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+        Utils.mediumVerticalSpace,
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await dialogSubmitButton(context);
+                },
+                child: const Text('افزودن'),
+              ),
+            ),
+            Utils.mediumHorizontalSpace,
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('لغو'),
+              ),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<void> editOnTap(
+    BuildContext context, {
+    required AdminPagesItemViewModel viewModel,
+  }) async {
+    imageBase64String = null;
+    customShowDialog(
+      context,
+      beforeCallingDialog: () {
+        addItemDialogTitleTextFieldController.text = '';
+        dialogAddressController.text = '';
+        dialogOwnerController.text = '';
+      },
+      title: const Text('افزودن رستوران'),
+      children: [
+        customTextFormField(
+          labelText: 'نام رستوران',
+          textInputAction: TextInputAction.done,
+          controller: addItemDialogTitleTextFieldController,
+          validator: dialogTitleFieldValidator,
+          autoValidateMode: AutovalidateMode.onUserInteraction,
+        ),
+        Utils.smallVerticalSpace,
+        customTextFormField(
+          labelText: 'نام صاحب رستوران',
+          textInputAction: TextInputAction.done,
+          controller: dialogOwnerController,
+          validator: dialogTitleFieldValidator,
+          autoValidateMode: AutovalidateMode.onUserInteraction,
+        ),
+        Utils.smallVerticalSpace,
+        customTextFormField(
+          labelText: 'آدرس رستوران',
+          textInputAction: TextInputAction.done,
+          controller: dialogAddressController,
+          validator: dialogTitleFieldValidator,
+          autoValidateMode: AutovalidateMode.onUserInteraction,
+        ),
+        Utils.smallVerticalSpace,
+        InkWell(
+          splashColor: Theme.of(context).primaryColor,
+          onTap: () async {
+            await addImageInkwellOnTap();
           },
           child: Row(
             children: [

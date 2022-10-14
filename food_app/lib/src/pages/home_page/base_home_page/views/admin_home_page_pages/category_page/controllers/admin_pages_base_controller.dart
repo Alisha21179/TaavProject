@@ -91,23 +91,20 @@ abstract class AdminPagesBaseController extends GetxController {
     return addedSuccessFully;
   }
 
-  Future<void> addImageInkwellOnTap(
-      {required void Function(Uint8List imageBytes) imageBytesHandler}) async {
+  Future<String?> addImageInkwellOnTap() async {
+    String? imageBase64;
     XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      imageBase64String = await ImageUtils.xFileToBase64String(
+      imageBase64 = await ImageUtils.xFileToBase64String(
         imageXFile: image,
       );
-    } else {
-      imageBase64String = null;
     }
+    return imageBase64;
   }
-
-  Future<void> dialogSubmitButton(BuildContext context);
 
   Future<void> deleteButtonOnTap(int categoryId) async {
     Either<String, bool> result =
-        await repository.deleteCategoryFromServer(categoryId);
+        await repository.deleteAdminPageItemFromServer(categoryId);
     result.fold(
       (l) => itemListServerProblem = 'مشکل در ارتباط با سرور',
       (r) {
@@ -126,8 +123,6 @@ abstract class AdminPagesBaseController extends GetxController {
     );
   }
 
-  Future<void> fABOnTap(BuildContext context);
-
   String? dialogTitleFieldValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'بدون ورودی چیزی اضافه نمی‌شود';
@@ -137,4 +132,10 @@ abstract class AdminPagesBaseController extends GetxController {
     }
     return null;
   }
+
+  Future<void> dialogSubmitButton(BuildContext context);
+
+  Future<void> fABOnTap(BuildContext context);
+
+  Future<void> editOnTap(BuildContext context,{required AdminPagesItemViewModel viewModel});
 }

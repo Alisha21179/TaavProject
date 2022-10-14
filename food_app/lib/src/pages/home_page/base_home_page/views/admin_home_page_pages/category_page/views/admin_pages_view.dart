@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../../../../components/admin_page_components/admin_page_list_view_item.dart';
 import '../../../../../../../components/search_box.dart';
+import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/utils/utils.dart';
 import '../controllers/admin_pages_base_controller.dart';
 
@@ -56,7 +57,9 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
                     deleteButtonOnTap: (viewModelId) async {
                       await _controller.deleteButtonOnTap(viewModelId);
                     },
-                    editButtonOnTap: (int viewModelId) async {},
+                    editButtonOnTap: (AdminPagesItemViewModel viewModel) async {
+                      await _controller.editOnTap(context,viewModel: viewModel);
+                    },
                     infoLines: _controller.infoLines,
                   );
                 },

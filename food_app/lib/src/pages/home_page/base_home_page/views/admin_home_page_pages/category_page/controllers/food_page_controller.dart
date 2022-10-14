@@ -93,9 +93,83 @@ class AdminFoodPageController extends AdminPagesBaseController {
         InkWell(
           splashColor: Theme.of(context).primaryColor,
           onTap: () async {
-            await addImageInkwellOnTap(
-              imageBytesHandler: (imageBytes) {},
-            );
+            imageBase64String=await addImageInkwellOnTap();
+          },
+          child: Row(
+            children: [
+              Icon(
+                Icons.image,
+                size: 40,
+                color: Theme.of(context).primaryColor,
+              ),
+              Utils.smallHorizontalSpace,
+              const Text(
+                'افزودن تصویر غذا',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+        Utils.mediumVerticalSpace,
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await dialogSubmitButton(context);
+                },
+                child: const Text('افزودن'),
+              ),
+            ),
+            Utils.mediumHorizontalSpace,
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('لغو'),
+              ),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<void> editOnTap(
+    BuildContext context, {
+    required AdminPagesItemViewModel viewModel,
+  }) async {
+    imageBase64String = null;
+    customShowDialog(
+      context,
+      beforeCallingDialog: () {
+        addItemDialogTitleTextFieldController.text = '';
+        foodIngredientController.text = '';
+      },
+      title: const Text('افزودن غذا'),
+      children: [
+        customTextFormField(
+          labelText: 'عنوان غذا',
+          textInputAction: TextInputAction.done,
+          controller: addItemDialogTitleTextFieldController,
+          validator: dialogTitleFieldValidator,
+          autoValidateMode: AutovalidateMode.onUserInteraction,
+        ),
+        Utils.smallVerticalSpace,
+        customTextFormField(
+            labelText: 'مواد تشکیل دهنده‌ی غذا',
+            textInputAction: TextInputAction.done,
+            controller: foodIngredientController,
+            validator: dialogTitleFieldValidator,
+            autoValidateMode: AutovalidateMode.onUserInteraction,
+            maxLines: 1),
+        Utils.smallVerticalSpace,
+        InkWell(
+          splashColor: Theme.of(context).primaryColor,
+          onTap: () async {
+            await addImageInkwellOnTap();
           },
           child: Row(
             children: [
