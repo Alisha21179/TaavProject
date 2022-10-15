@@ -27,4 +27,13 @@ class FoodViewModel extends AdminPagesItemViewModel {
       foodBase64Image: json[FoodViewModel.foodBase64ImageKey],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      idKey: id,
+      foodNameKey: title,
+      foodIngredientKey: foodIngredient,
+      foodBase64ImageKey: imageBase64String,
+    };
+  }
 }

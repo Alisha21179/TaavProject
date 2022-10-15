@@ -3,16 +3,20 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:food_app/food_app.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/models/category_page_models/category_edit_dto.dart';
 import 'package:get/get.dart';
 
+import '../../../../../../../components/admin_page_components/edit_food_list_dialog.dart';
+import '../../../../../../../components/admin_page_components/food_list_item.dart';
 import '../../../../../../../components/text_form_field.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/category_view_model.dart';
+import '../../../../../../../infrastructure/commons/models/admin_pages_models/food_view_model.dart';
 import '../../../../../../../infrastructure/utils/utils.dart';
+import '../models/category_page_models/category_edit_dto.dart';
 import '../models/category_page_models/category_insert_dto.dart';
 import '../repositories/admin_page_base_repository.dart';
 import '../repositories/category_page_repository.dart';
+import '../repositories/food_page_repository.dart';
 import 'admin_pages_base_controller.dart';
 
 class AdminCategoryPageController extends AdminPagesBaseController {
@@ -21,6 +25,12 @@ class AdminCategoryPageController extends AdminPagesBaseController {
 
   @override
   AdminPagesBaseRepository repository = CategoryPageRepository();
+
+  final FoodPageRepository _foodPageRepository = FoodPageRepository();
+
+  List<Map<String, dynamic>> addCategoryDialogFoodList=[];
+
+  // RxList<FoodViewModel> wholeFoodList = RxList([]);
 
   @override
   List<Widget> Function(AdminPagesItemViewModel viewModel) infoLines =
@@ -42,7 +52,7 @@ class AdminCategoryPageController extends AdminPagesBaseController {
     bool addedSuccessFully = false;
     if (addItemDialogTitleTextFieldController.text.isNotEmpty) {
       CategoryInsertDTO insertDTO = CategoryInsertDTO(
-        foodList: [],
+        foodList: addCategoryDialogFoodList,
         title: addItemDialogTitleTextFieldController.text,
         imageBase64String: imageBase64String,
       );
@@ -58,11 +68,13 @@ class AdminCategoryPageController extends AdminPagesBaseController {
 
   @override
   Future<void> fABOnTap(BuildContext context) async {
+    imageBase64String = null;
+    addCategoryDialogFoodList=[];
+    addItemDialogTitleTextFieldController.text = '';
+    List<Map<String, dynamic>> insideAddCategoryDialogFoodList = [];
+    RxnString insideImageBase64String = RxnString(null);
     customShowDialog(
       context,
-      beforeCallingDialog: () {
-        addItemDialogTitleTextFieldController.text = '';
-      },
       title: const Text('افزودن دسته‌بندی'),
       children: [
         customTextFormField(
@@ -73,24 +85,51 @@ class AdminCategoryPageController extends AdminPagesBaseController {
           autoValidateMode: AutovalidateMode.onUserInteraction,
         ),
         Utils.smallVerticalSpace,
-        InkWell(
-          splashColor: Theme.of(context).primaryColor,
-          onTap: () async {
-            imageBase64String = await addImageInkwellOnTap();
-          },
-          child: Row(
-            children: [
-              Icon(
-                Icons.image,
-                size: 40,
-                color: Theme.of(context).primaryColor,
-              ),
-              Utils.smallHorizontalSpace,
-              const Text(
-                'افزودن تصویر دسته‌بندی',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-            ],
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () async {
+              List<FoodViewModel> myList = await editFoodListButtonOnTap();
+              insideAddCategoryDialogFoodList = myList.map((e) => e.toJson()).toList();
+            },
+            child: const Text('مدیریت لیست غذا'),
+          ),
+        ),
+        Utils.smallVerticalSpace,
+        Obx(
+          () => InkWell(
+            splashColor: Theme.of(context).primaryColor,
+            onTap: () async {
+              insideImageBase64String.value = await addImageInkwellOnTap();
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.image,
+                  size: 40,
+                  color: Theme.of(context).primaryColor,
+                ),
+                Utils.smallHorizontalSpace,
+                const Text(
+                  'افزودن تصویر دسته‌بندی',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const Expanded(child: Utils.mereSizedBox),
+                SizedBox(
+                  height: 40,
+                  child: insideImageBase64String.value != null
+                      ? Image.memory(
+                          base64Decode(insideImageBase64String.value!),
+                          fit: BoxFit.fitHeight,
+                        )
+                      : Icon(
+                          Icons.broken_image_outlined,
+                          size: 40,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
         Utils.mediumVerticalSpace,
@@ -99,6 +138,8 @@ class AdminCategoryPageController extends AdminPagesBaseController {
             Expanded(
               child: ElevatedButton(
                 onPressed: () async {
+                  addCategoryDialogFoodList = insideAddCategoryDialogFoodList;
+                  imageBase64String = insideImageBase64String.value;
                   await dialogSubmitButton(context);
                 },
                 child: const Text('افزودن'),
@@ -117,7 +158,6 @@ class AdminCategoryPageController extends AdminPagesBaseController {
         ),
       ],
     );
-    imageBase64String = null;
   }
 
   @override
@@ -126,9 +166,11 @@ class AdminCategoryPageController extends AdminPagesBaseController {
     required AdminPagesItemViewModel viewModel,
   }) async {
     CategoryViewModel categoryViewModel = viewModel as CategoryViewModel;
-    TextEditingController editItemDialogTitleTextFieldController =
+    TextEditingController editItemDialogTitleController =
         TextEditingController(text: categoryViewModel.title);
-    Rxn<String> editDialogImageBase64 = Rxn(categoryViewModel.imageBase64String);
+    Rxn<String> editDialogImageBase64 =
+        Rxn(categoryViewModel.imageBase64String);
+    List<dynamic> editDialogFoodList = categoryViewModel.foodList;
     customShowDialog(
       context,
       title: const Text('ویرایش دسته‌بندی '),
@@ -136,50 +178,63 @@ class AdminCategoryPageController extends AdminPagesBaseController {
         customTextFormField(
           labelText: 'عنوان دسته بندی',
           textInputAction: TextInputAction.done,
-          controller: editItemDialogTitleTextFieldController,
+          controller: editItemDialogTitleController,
           validator: dialogTitleFieldValidator,
           autoValidateMode: AutovalidateMode.onUserInteraction,
         ),
         Utils.smallVerticalSpace,
-        Obx(() => InkWell(
-              splashColor: Theme.of(context).primaryColor,
-              onTap: () async {
-                String? chosenImageBase64;
-                chosenImageBase64 = await addImageInkwellOnTap();
-                if (chosenImageBase64 != null) {
-                  editDialogImageBase64.value = chosenImageBase64;
-                }
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.image,
-                    size: 40,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  Utils.smallHorizontalSpace,
-                  const Text(
-                    'ویرایش تصویر دسته‌بندی',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  const Expanded(child: Utils.mereSizedBox),
-                  SizedBox(
-                    height: 40,
-                    child: editDialogImageBase64.value != null
-                        ? Image.memory(
-                            base64Decode(editDialogImageBase64.value!),
-                            fit: BoxFit.fitHeight,
-                          )
-                        : Icon(
-                            Icons.broken_image_outlined,
-                            size: 40,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                  ),
-                ],
-              ),
-            )),
+        Obx(
+          () => InkWell(
+            splashColor: Theme.of(context).primaryColor,
+            onTap: () async {
+              String? chosenImageBase64;
+              chosenImageBase64 = await addImageInkwellOnTap();
+              if (chosenImageBase64 != null) {
+                editDialogImageBase64.value = chosenImageBase64;
+              }
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.image,
+                  size: 40,
+                  color: Theme.of(context).primaryColor,
+                ),
+                Utils.smallHorizontalSpace,
+                const Text(
+                  'ویرایش تصویر دسته‌بندی',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const Expanded(child: Utils.mereSizedBox),
+                SizedBox(
+                  height: 40,
+                  child: editDialogImageBase64.value != null
+                      ? Image.memory(
+                          base64Decode(editDialogImageBase64.value!),
+                          fit: BoxFit.fitHeight,
+                        )
+                      : Icon(
+                          Icons.broken_image_outlined,
+                          size: 40,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
         Utils.mediumVerticalSpace,
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () async {
+              List<FoodViewModel> myList =
+                  await editFoodListButtonOnTap(categoryViewModel);
+              editDialogFoodList = myList.map((e) => e.toJson()).toList();
+            },
+            child: const Text('مدیریت لیست غذا'),
+          ),
+        ),
         Utils.mediumVerticalSpace,
         Row(
           children: [
@@ -187,12 +242,14 @@ class AdminCategoryPageController extends AdminPagesBaseController {
               child: ElevatedButton(
                 onPressed: () async {
                   CategoryEditDTO editDTO = CategoryEditDTO(
-                    foodList: [],
-                    title: editItemDialogTitleTextFieldController.text,
+                    foodList: editDialogFoodList,
+                    title: editItemDialogTitleController.text,
                     imageBase64String: editDialogImageBase64.value,
                   );
                   await editDialogSubmitButtonOnTap(
-                      categoryId: categoryViewModel.id, editDTO: editDTO);
+                    categoryId: categoryViewModel.id,
+                    editDTO: editDTO,
+                  );
                   await getPageItemList();
                   Navigator.pop(context);
                 },
@@ -259,5 +316,78 @@ class AdminCategoryPageController extends AdminPagesBaseController {
         }
       },
     );
+  }
+
+  Future<List<FoodViewModel>> editFoodListButtonOnTap(
+      [CategoryViewModel? viewModel]) async {
+    List<FoodViewModel> foodList = await getFoodList();
+    List<FoodViewModel> categoryMapFoodList = viewModel != null
+        ? viewModel.foodList.map(
+            (e) {
+              return FoodViewModel.fromJson(json: e);
+            },
+          ).toList()
+        : [];
+    /*wholeFoodList = */
+    categoryMapFoodList = await Get.dialog(
+      EditFoodListDialog(
+        title: 'مدیریت لیست غذا',
+        children: List.generate(
+          foodList.length,
+          (index) {
+            bool foodExistsInTheCategoryList = false;
+            if (categoryMapFoodList
+                .map(
+                  (e) {
+                    return e.title;
+                  },
+                )
+                .toList()
+                .contains(
+                  foodList[index].title,
+                )) {
+              foodExistsInTheCategoryList = true;
+            }
+            return FoodListItem(
+              foodViewModel: foodList[index],
+              foodExistsInTheCategoryList: foodExistsInTheCategoryList,
+            );
+          },
+        ),
+        submitButtonOnPressed: (List<FoodListItem> foodListItemList) async {
+          List<FoodViewModel> returningFoodListItemList =
+              listOfSelected(foodListItemList);
+          Get.back(result: returningFoodListItemList);
+        },
+      ),
+    );
+    return categoryMapFoodList;
+  }
+
+  List<FoodViewModel> listOfSelected(
+    List<FoodListItem> foodListItemList,
+  ) {
+    List<FoodViewModel> returningFoodListItemList = [];
+    for (FoodListItem item in foodListItemList) {
+      if (item.foodExistsInTheCategoryList) {
+        returningFoodListItemList.add(item.foodViewModel);
+      }
+    }
+    return returningFoodListItemList;
+  }
+
+  Future<List<FoodViewModel>> getFoodList() async {
+    List<FoodViewModel> foodList = [];
+    Either<String, List<AdminPagesItemViewModel>> result =
+        await _foodPageRepository.getItemList();
+    result.fold(
+      (l) => null,
+      (r) {
+        r as List<FoodViewModel>;
+        foodList = r;
+        itemListServerProblem = null;
+      },
+    );
+    return foodList;
   }
 }

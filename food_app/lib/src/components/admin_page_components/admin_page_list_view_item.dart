@@ -81,7 +81,6 @@ class _AdminPageListItemState extends State<AdminPageListItem> {
                 ElevatedButton(
                   onPressed: () async {
                     await widget._editButtonOnTap(widget._viewModel);
-                    print(widget._viewModel.title);
                   },
                   child: const Icon(Icons.edit),
                 ),
