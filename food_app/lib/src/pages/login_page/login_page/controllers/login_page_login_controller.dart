@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:food_app/src/infrastructure/utils/get_storage_utils.dart';
 import 'package:get/get.dart';
 
 import '../../../../infrastructure/commons/models/user_view_model.dart';
@@ -55,9 +56,13 @@ class LoginPageController extends LoginPageBaseController {
           },
         );
         if (mainFormKey.currentState!.validate()) {
+          await box.write(GetStorageUtils.loggedInUserUsernameKey,foundUser?.username);
+          await box.write(GetStorageUtils.loggedInUserPasswordKey,foundUser?.password);
+          print(box.read(GetStorageUtils.loggedInUserUsernameKey));
+          print(box.read(GetStorageUtils.loggedInUserPasswordKey));
           if (rememberMeCheckBoxValue.value) {
-            await box.write('savedUser_username', foundUser?.username);
-            await box.write('savedUser_password', foundUser?.password);
+            await box.write(GetStorageUtils.savedUserUsernameKey, foundUser?.username);
+            await box.write(GetStorageUtils.savedUserPasswordKey, foundUser?.password);
           }
           if (foundUser!.isAdmin) {
             Get.offAndToNamed(

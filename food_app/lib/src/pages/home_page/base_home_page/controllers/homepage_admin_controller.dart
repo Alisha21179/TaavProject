@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/controllers/food_page_controller.dart';
-import 'package:food_app/src/pages/home_page/base_home_page/views/admin_home_page_pages/category_page/controllers/restaurants_page_controller.dart';
 import 'package:get/get.dart';
 
-import '../views/admin_home_page_pages/category_page/controllers/admin_pages_base_controller.dart';
 import '../views/admin_home_page_pages/category_page/controllers/category_page_controller.dart';
+import '../views/admin_home_page_pages/category_page/controllers/food_page_controller.dart';
+import '../views/admin_home_page_pages/category_page/controllers/restaurants_page_controller.dart';
 import '../views/admin_home_page_pages/category_page/views/admin_pages_view.dart';
+import '../views/shared_pages/my_profile_page/views/my_profile_page_view.dart';
 import 'homepage_base_controller.dart';
 
 class AdminHomePageController extends BaseHomePageController {
@@ -29,6 +29,7 @@ class AdminHomePageController extends BaseHomePageController {
     AdminPagesView<AdminFoodPageController>(
       getXController: AdminFoodPageController(),
     ),
+    MyProfilePageView(),
   ];
 
   @override

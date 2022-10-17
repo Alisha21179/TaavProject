@@ -5,6 +5,8 @@ import 'package:food_app/src/pages/splash_page/repositories/splash_page_reposito
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../../../infrastructure/utils/get_storage_utils.dart';
+
 class SplashPageController extends GetxController {
   RxBool adminAvailable = false.obs;
   RxBool showIndicator = false.obs;
@@ -31,10 +33,7 @@ class SplashPageController extends GetxController {
     _setStatusOfAdmin();
     await _indicatorController();
     if (adminAvailable.value) {
-      savedUser = await _getSavedUser(
-        usernameKey: 'savedUser_username',
-        passwordKey: 'savedUserPassword',
-      );
+      savedUser = await _getSavedUser();
       if (savedUser != null) {
         if (savedUser!.isAdmin) {
           Get.offAndToNamed(
@@ -100,10 +99,9 @@ class SplashPageController extends GetxController {
     );
   }
 
-  Future<UserViewModel?> _getSavedUser(
-      {required String usernameKey, required String passwordKey}) async {
-    String? savedUserUsername = box.read('savedUser_username');
-    String? savedUserPassword = box.read('savedUser_password');
+  Future<UserViewModel?> _getSavedUser() async {
+    String? savedUserUsername = box.read(GetStorageUtils.savedUserUsernameKey);
+    String? savedUserPassword = box.read(GetStorageUtils.savedUserPasswordKey);
     UserViewModel? returnedUser;
     if (savedUserUsername == null || savedUserPassword == null) {
       Get.offAndToNamed(FoodAppPageRoutes.loginPage);

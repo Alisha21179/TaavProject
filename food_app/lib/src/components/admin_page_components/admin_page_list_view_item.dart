@@ -44,7 +44,6 @@ class _AdminPageListItemState extends State<AdminPageListItem> {
                   width: 120,
                   child: ImageUtils.base64StringToWidget(
                     base64String: widget._viewModel.imageBase64String!,
-                    imageName: widget._viewModel.title,
                     imageReturner: (imageBytes) {
                       return Image.memory(
                         imageBytes,

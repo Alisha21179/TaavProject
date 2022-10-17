@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -16,11 +15,9 @@ class ImageUtils {
 
   static Widget base64StringToWidget({
     required String base64String,
-    required String imageName,
     required Image Function(Uint8List imageBytes,) imageReturner,
   }) {
     Uint8List bytes = base64.decode(base64String);
-    // var file = io.File('$imageName.png');
     Image image = imageReturner(bytes);
     return image;
   }

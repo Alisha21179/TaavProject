@@ -7,7 +7,8 @@ import '../../../../../../../infrastructure/commons/models/admin_pages_models/ad
 import '../../../../../../../infrastructure/utils/utils.dart';
 import '../controllers/admin_pages_base_controller.dart';
 
-class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget {
+class AdminPagesView<T extends AdminPagesBaseController>
+    extends StatelessWidget {
   AdminPagesView({
     Key? key,
     required T getXController,
@@ -55,10 +56,16 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
                   return AdminPageListItem(
                     viewModel: _controller.itemList.value[index],
                     deleteButtonOnTap: (viewModelId) async {
-                      await _controller.deleteButtonOnTap(viewModelId);
+                      await Get.dialog(
+                        await _deleteItemAlertDialog(
+                          context,
+                          viewModelId: viewModelId,
+                        ),
+                      );
                     },
                     editButtonOnTap: (AdminPagesItemViewModel viewModel) async {
-                      await _controller.editOnTap(context,viewModel: viewModel);
+                      await _controller.editOnTap(context,
+                          viewModel: viewModel);
                     },
                     infoLines: _controller.infoLines,
                   );
@@ -68,6 +75,44 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
           ],
         ),
       ),
+    );
+  }
+
+  Future<Widget> _deleteItemAlertDialog(BuildContext context,
+      {required int viewModelId}) async {
+    return AlertDialog(
+      title: Text(
+        'از حذف این مورد اطمینان دارید؟',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(08),
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await _controller.deleteButtonOnTap(viewModelId);
+                    Get.back();
+                    _controller.getPageItemList();
+                  },
+                  child: const Text('بله'),
+                ),
+              ),
+              Utils.smallHorizontalSpace,
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text('خیر'),
+                ),
+              )
+            ],
+          ),
+        )
+      ],
     );
   }
 }

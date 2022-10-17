@@ -184,6 +184,7 @@ class LoginPageView<T extends LoginPageBaseController> extends GetView<T> {
             ? obSecureSuffixIcon(isObSecure: controller.passwordIsObSecure)
             : null,
         validator: controller.passwordValidator,
+        maxLines: 1
       ),
     );
   }
@@ -194,6 +195,7 @@ class LoginPageView<T extends LoginPageBaseController> extends GetView<T> {
       controller: controller.usernameController,
       labelText: 'نام کاربری',
       validator: controller.usernameValidator,
+      maxLines: 1
     );
   }
 

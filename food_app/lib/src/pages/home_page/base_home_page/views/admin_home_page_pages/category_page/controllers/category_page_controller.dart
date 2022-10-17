@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 
 import '../../../../../../../components/admin_page_components/edit_food_list_dialog.dart';
 import '../../../../../../../components/admin_page_components/food_list_item.dart';
-import '../../../../../../../components/admin_page_components/restaurant_food_list_item.dart';
 import '../../../../../../../components/text_form_field.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/category_view_model.dart';
