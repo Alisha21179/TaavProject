@@ -9,8 +9,8 @@ import '../models/admin_page_base_insert_dto.dart';
 import '../repositories/admin_page_base_repository.dart';
 
 abstract class AdminPagesBaseController extends GetxController {
-  TextEditingController addItemDialogTitleTextFieldController =
-      TextEditingController();
+  // TextEditingController addItemDialogTitleTextFieldController =
+  //     TextEditingController();
   abstract TextEditingController searchBoxController;
   abstract final AdminPagesBaseRepository repository;
   abstract final List<Widget> Function(
@@ -18,7 +18,6 @@ abstract class AdminPagesBaseController extends GetxController {
   ) infoLines;
   final ImagePicker imagePicker = ImagePicker();
   String? itemListServerProblem;
-  String? imageBase64String;
   Rx<List<AdminPagesItemViewModel>> itemList = Rx([]);
 
   @override
@@ -131,9 +130,13 @@ abstract class AdminPagesBaseController extends GetxController {
     return null;
   }
 
-  Future<void> dialogSubmitButton(BuildContext context);
+  Future<void> addNewItemDialogSubmitButton(
+    BuildContext context, {
+    required AdminPageBaseInsertDTO insertDTO,
+  });
 
-  Future<void> fABOnTap(BuildContext context);
+  Future<void> fABOnTapAddNewItem(BuildContext context);
 
-  Future<void> editOnTap(BuildContext context,{required AdminPagesItemViewModel viewModel});
+  Future<void> editOnTap(BuildContext context,
+      {required AdminPagesItemViewModel viewModel});
 }

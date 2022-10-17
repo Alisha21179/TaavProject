@@ -7,12 +7,12 @@ import '../../infrastructure/utils/utils.dart';
 
 class FoodListItem extends StatefulWidget {
   final FoodViewModel foodViewModel;
-  bool foodExistsInTheCategoryList = false;
+  bool foodExistsInTheViewModelList = false;
 
   FoodListItem({
     Key? key,
     required this.foodViewModel,
-    required this.foodExistsInTheCategoryList,
+    required this.foodExistsInTheViewModelList,
   }) : super(key: key);
 
   @override
@@ -61,10 +61,10 @@ class _FoodListItemState extends State<FoodListItem> {
               Text(widget.foodViewModel.title),
               const Expanded(child: Utils.mereSizedBox),
               Checkbox(
-                value: widget.foodExistsInTheCategoryList,
+                value: widget.foodExistsInTheViewModelList,
                 onChanged: (value) {
-                  widget.foodExistsInTheCategoryList =
-                      !widget.foodExistsInTheCategoryList;
+                  widget.foodExistsInTheViewModelList =
+                      !widget.foodExistsInTheViewModelList;
                   setState(() {});
                 },
               ),

@@ -47,9 +47,9 @@ abstract class AdminPagesBaseRepository {
     }
   }
 
-  Future<Either<String, bool>> editAdminItemInServer({
+  Future<Either<String, bool>> editAdminItemInServer<T extends AdminPageBaseEditDTO>({
     required int adminItemId,
-    required AdminPageBaseEditDTO editDTO,
+    required T editDTO,
   }) async {
     bool editionWasSuccessFull = false;
     try {

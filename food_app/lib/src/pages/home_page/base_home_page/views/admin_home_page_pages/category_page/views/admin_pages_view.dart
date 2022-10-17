@@ -23,7 +23,7 @@ class AdminPagesView<T extends AdminPagesBaseController> extends StatelessWidget
         elevation: 5,
         child: const Icon(Icons.add),
         onPressed: () async {
-          await _controller.fABOnTap(context);
+          await _controller.fABOnTapAddNewItem(context);
         },
       ),
       body: _body(context),

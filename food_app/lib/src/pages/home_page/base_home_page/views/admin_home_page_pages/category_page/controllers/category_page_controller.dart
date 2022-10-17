@@ -7,11 +7,13 @@ import 'package:get/get.dart';
 
 import '../../../../../../../components/admin_page_components/edit_food_list_dialog.dart';
 import '../../../../../../../components/admin_page_components/food_list_item.dart';
+import '../../../../../../../components/admin_page_components/restaurant_food_list_item.dart';
 import '../../../../../../../components/text_form_field.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/admin_pages_view_models.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/category_view_model.dart';
 import '../../../../../../../infrastructure/commons/models/admin_pages_models/food_view_model.dart';
 import '../../../../../../../infrastructure/utils/utils.dart';
+import '../models/admin_page_base_insert_dto.dart';
 import '../models/category_page_models/category_edit_dto.dart';
 import '../models/category_page_models/category_insert_dto.dart';
 import '../repositories/admin_page_base_repository.dart';
@@ -27,10 +29,6 @@ class AdminCategoryPageController extends AdminPagesBaseController {
   AdminPagesBaseRepository repository = CategoryPageRepository();
 
   final FoodPageRepository _foodPageRepository = FoodPageRepository();
-
-  List<Map<String, dynamic>> addCategoryDialogFoodList=[];
-
-  // RxList<FoodViewModel> wholeFoodList = RxList([]);
 
   @override
   List<Widget> Function(AdminPagesItemViewModel viewModel) infoLines =
@@ -48,15 +46,14 @@ class AdminCategoryPageController extends AdminPagesBaseController {
   };
 
   @override
-  Future<void> dialogSubmitButton(BuildContext context) async {
+  Future<void> addNewItemDialogSubmitButton(
+    BuildContext context, {
+    required AdminPageBaseInsertDTO insertDTO,
+  }) async {
     bool addedSuccessFully = false;
-    if (addItemDialogTitleTextFieldController.text.isNotEmpty) {
-      CategoryInsertDTO insertDTO = CategoryInsertDTO(
-        foodList: addCategoryDialogFoodList,
-        title: addItemDialogTitleTextFieldController.text,
-        imageBase64String: imageBase64String,
-      );
-      addedSuccessFully = await addItemToServer(insertDTO: insertDTO);
+    CategoryInsertDTO insideInsertDTO = insertDTO as CategoryInsertDTO;
+    if (insertDTO.title.trim().isNotEmpty) {
+      addedSuccessFully = await addItemToServer(insertDTO: insideInsertDTO);
       if (addedSuccessFully) {
         getPageItemList();
         // Navigator.pop(context);
@@ -67,10 +64,8 @@ class AdminCategoryPageController extends AdminPagesBaseController {
   }
 
   @override
-  Future<void> fABOnTap(BuildContext context) async {
-    imageBase64String = null;
-    addCategoryDialogFoodList=[];
-    addItemDialogTitleTextFieldController.text = '';
+  Future<void> fABOnTapAddNewItem(BuildContext context) async {
+    TextEditingController insideAddItemDialogTitleTextFieldController=TextEditingController();
     List<Map<String, dynamic>> insideAddCategoryDialogFoodList = [];
     RxnString insideImageBase64String = RxnString(null);
     customShowDialog(
@@ -80,7 +75,7 @@ class AdminCategoryPageController extends AdminPagesBaseController {
         customTextFormField(
           labelText: 'عنوان دسته بندی',
           textInputAction: TextInputAction.done,
-          controller: addItemDialogTitleTextFieldController,
+          controller: insideAddItemDialogTitleTextFieldController,
           validator: dialogTitleFieldValidator,
           autoValidateMode: AutovalidateMode.onUserInteraction,
         ),
@@ -90,7 +85,8 @@ class AdminCategoryPageController extends AdminPagesBaseController {
           child: ElevatedButton(
             onPressed: () async {
               List<FoodViewModel> myList = await editFoodListButtonOnTap();
-              insideAddCategoryDialogFoodList = myList.map((e) => e.toJson()).toList();
+              insideAddCategoryDialogFoodList =
+                  myList.map((e) => e.toJson()).toList();
             },
             child: const Text('مدیریت لیست غذا'),
           ),
@@ -138,9 +134,14 @@ class AdminCategoryPageController extends AdminPagesBaseController {
             Expanded(
               child: ElevatedButton(
                 onPressed: () async {
-                  addCategoryDialogFoodList = insideAddCategoryDialogFoodList;
-                  imageBase64String = insideImageBase64String.value;
-                  await dialogSubmitButton(context);
+                  await addNewItemDialogSubmitButton(
+                    context,
+                    insertDTO: CategoryInsertDTO(
+                      foodList: insideAddCategoryDialogFoodList,
+                      title: insideAddItemDialogTitleTextFieldController.text,
+                      imageBase64String: insideImageBase64String.value,
+                    ),
+                  );
                 },
                 child: const Text('افزودن'),
               ),
@@ -350,7 +351,7 @@ class AdminCategoryPageController extends AdminPagesBaseController {
             }
             return FoodListItem(
               foodViewModel: foodList[index],
-              foodExistsInTheCategoryList: foodExistsInTheCategoryList,
+              foodExistsInTheViewModelList: foodExistsInTheCategoryList,
             );
           },
         ),
@@ -369,7 +370,7 @@ class AdminCategoryPageController extends AdminPagesBaseController {
   ) {
     List<FoodViewModel> returningFoodListItemList = [];
     for (FoodListItem item in foodListItemList) {
-      if (item.foodExistsInTheCategoryList) {
+      if (item.foodExistsInTheViewModelList) {
         returningFoodListItemList.add(item.foodViewModel);
       }
     }

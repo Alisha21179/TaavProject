@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:food_app/src/components/admin_page_components/restaurant_food_list_item.dart';
 
 import '../../infrastructure/utils/utils.dart';
-import 'food_list_item.dart';
 
-class EditFoodListDialog extends StatefulWidget {
+class EditRestaurantFoodListDialog extends StatefulWidget {
   final String title;
-  final List<FoodListItem> children;
-  final Future<void> Function(List<FoodListItem> foodListItemList)
-      submitButtonOnPressed;
+  final List<RestaurantFoodListItem> children;
+  final Future<void> Function(List<RestaurantFoodListItem> foodListItemList)
+  submitButtonOnPressed;
 
-  const EditFoodListDialog({
+  const EditRestaurantFoodListDialog({
     Key? key,
     required this.title,
     required this.children,
@@ -17,10 +17,10 @@ class EditFoodListDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<EditFoodListDialog> createState() => _EditFoodListDialogState();
+  State<EditRestaurantFoodListDialog> createState() => _EditFoodListDialogState();
 }
 
-class _EditFoodListDialogState extends State<EditFoodListDialog> {
+class _EditFoodListDialogState extends State<EditRestaurantFoodListDialog> {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
